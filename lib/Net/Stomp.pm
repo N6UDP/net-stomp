@@ -271,8 +271,9 @@ sub send_frame {
             . ($written||0)
             . ' characters out of the '
             . length($frame->as_string)
-            . ' character frame';
+            . ' character frame, reconnecting';
         warn 'problem frame: <<' . $frame->as_string . '>>';
+        $self->socket->close;
     }
     unless (defined $self->_connected) {
         $self->_reconnect;
