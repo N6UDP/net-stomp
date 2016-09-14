@@ -178,16 +178,21 @@ sub _get_socket {
 sub connect {
     my ( $self, $conf ) = @_;
 
+    my %conf = %{ $conf || {} };
+    my $timeout = exists $conf{timeout}
+        ? delete $conf{timeout}
+        : $self->timeout;
+
     my $frame = Net::Stomp::Frame->new(
-        { command => 'CONNECT', headers => $conf } );
+        { command => 'CONNECT', headers => \%conf } );
     $self->send_frame($frame);
-    $frame = $self->receive_frame;
+    $frame = $self->receive_frame({timeout=>$timeout});
 
     if ($frame && $frame->command eq 'CONNECTED') {
         # Setting initial values for session id, as given from
         # the stomp server
         $self->session_id( $frame->headers->{session} );
-        $self->_connect_headers( $conf );
+        $self->_connect_headers( \%conf );
     }
 
     return $frame;
