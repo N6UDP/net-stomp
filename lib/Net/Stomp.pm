@@ -395,9 +395,9 @@ sub send_frame {
     }
     unless (defined $written && $self->_connected) {
         $self->_reconnect;
-        $self->send_frame($frame);
+        return $self->send_frame($frame);
     }
-    return;
+    return $written;
 }
 
 sub _read_data {
